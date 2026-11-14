@@ -1,19 +1,12 @@
 from PIL import Image
+from pathlib import Path
 
-src_path = "/home/hatch/workspace/makefun/food-picture-01-work/media-generation-food-hero-burger-0-4c7c1495-75ce-4d6f-a2d9-c180540f01b5.png"
-im = Image.open(src_path).convert("RGB")
-width, height = im.size
+source_path = Path("/home/hatch/workspace/makefun/food-picture-01-work/media-generation-food-hero-ramen-pull-v2-0-16e6e6ac-2a5f-4a80-b18a-8785b7cc309a.webp")
+output_path = Path("entry.png")
 
-min_dim = min(width, height)
-left = (width - min_dim) // 2
-top = (height - min_dim) // 2
-right = left + min_dim
-bottom = top + min_dim
-
-im_cropped = im.crop((left, top, right, bottom))
-im_resized = im_cropped.resize((1024, 1024), Image.Resampling.LANCZOS)
-
-# Quantize to 256 colors to fit under 1MB while remaining RGB mode
-im_quantized = im_resized.quantize(colors=256, method=Image.Quantize.MEDIANCUT).convert("RGB")
-im_quantized.save("entry.png", format="PNG", optimize=True, compress_level=9)
-print("Successfully generated entry.png with size 1024x1024")
+img = Image.open(source_path).convert("RGB")
+# Target dimensions: 683x1024 portrait (within 1024x1024 max dimension limit)
+img = img.resize((683, 1024), Image.Resampling.LANCZOS)
+img = img.quantize(colors=256, method=Image.Quantize.MEDIANCUT).convert("RGB")
+img.save(output_path, format="PNG", optimize=True, compress_level=9)
+print(f"Successfully processed {source_path} to {output_path} with size {img.size}")
